@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Interaction Flow (Mobile App) - Page 1</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            overflow: hidden;
+        }
+        .slide {
+            max-width: 1280px;
+            width: 100%;
+            height: 720px;
+            position: relative;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #0052D4, #4364F7, #6FB1FC);
+        }
+        .circuit-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            background-image: 
+              linear-gradient(90deg, #0052D4 1px, transparent 1px),
+              linear-gradient(0deg, #0052D4 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 0;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0.5rem 1rem;
+        }
+        .mermaid {
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.75rem;
+        }
+        .phone-mockup {
+            border: 8px solid #374151;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s;
+            max-width: 200px;
+        }
+        .phone-mockup:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -4px rgba(0, 0, 0, 0.2);
+        }
+        .phone-screen {
+            background: #1e293b;
+            height: 100%;
+        }
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 12px;
+            background: #374151;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            z-index: 10;
+        }
+        .step-number {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #8b5cf6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 6px;
+            font-size: 0.75rem;
+        }
+        .status-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        footer {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .slide {
+                height: auto;
+            }
+            .content {
+                padding: 0.25rem;
+            }
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+            .phone-mockup {
+                max-width: 100%;
+            }
+            .text-2xl {
+                font-size: 1.5rem;
+            }
+            .text-sm {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-1">
+    <div class="slide flex flex-col">
+        <div class="header-accent"></div>
+        <div class="circuit-lines"></div>
+        
+        <div class="content">
+            <h1 class="text-2xl font-bold mb-2 text-gray-800 border-b-2 border-purple-500 pb-1">User Interaction Flow (Mobile App)</h1>
+            
+            <div class="mb-2">
+                <div class="mermaid flex justify-center">
+                    graph LR
+                      A["User<br>Login"] -->|"Authentication"| B["Main<br>Dashboard"]
+                      B -->|"Select Site"| C["Site/Sensor<br>Details"]
+                      D["Push<br>Notification"] -.->|"Critical Alert"| E["Acknowledge<br>Remotely"]
+                      
+                      classDef login fill:#fce7f3,stroke:#db2777,stroke-width:2px
+                      classDef dashboard fill:#ede9fe,stroke:#8b5cf6,stroke-width:2px
+                      classDef details fill:#dbeafe,stroke:#3b82f6,stroke-width:2px
+                      classDef notify fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+                      classDef ack W fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+                      
+                      class A login
+                      class B dashboard
+                      class C details
+                      class D notify
+                      class E ack
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 justify-center">
+                <!-- LOGIN -->
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center mb-1 w-full">
+                        <div class="step-number">1</div>
+                        <h3 class="text-sm font-semibold text-gray-800">User Login</h3>
+                    </div>
+                    
+                    <div class="phone-mockup w-full">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen bg-purple-50 p-2">
+                            <div class="flex justify-center mb-2">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <i class="fas fa-tachometer-alt text-purple-600 text-lg"></i>
+                                </div>
+                            </div>
+                            <div class="text-center text-sm font-bold text-purple-800 mb-2">TankMonitor</div>
+                            <div class="bg-white rounded-md p-1 shadow-sm mb-1">
+                                <div class="text-xs text-gray-500 mb-0.5">Username</div>
+                                <div class="h-4 bg-gray-100 rounded"></div>
+                            </div>
+                            <div class="bg-white rounded-md p-1 shadow-sm mb-2">
+                                <div class="text-xs text-gray-500 mb-0.5">Password</div>
+                                <div class="h-4 bg-gray-100 rounded"></div>
+                            </div>
+                            <div class="bg-purple-600 text-white text-center py-1 rounded-md text-xs font-medium">
+                                Login
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- DASHBOARD -->
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center mb-1 w-full">
+                        <div class="step-number">2</div>
+                        <h3 class="text-sm font-semibold text-gray-800">Dashboard</h3>
+                    </div>
+                    
+                    <div class="phone-mockup w-full">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen bg-gray-50 p-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="text-sm font-bold text-gray-800">Dashboard</div>
+                                <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-600 text-xs"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="text-xs text-gray-500 mb-0.5">SITES OVERVIEW</div>
+                            <div class="grid grid-cols-2 gap-1 mb-1">
+                                <div class="bg-white p-1 rounded-md shadow-sm relative">
+                                    <div class="status-badge bg-green-500"></div>
+                                    <div class="text-xs font-medium">Site 1</div>
+                                    <div class="text-xs text-gray-500">4 tanks</div>
+                                </div>
+                                <div class="bg-white p-1 rounded-md shadow-sm relative">
+                                    <div class="status-badge bg-red-500"></div>
+                                    <div class="text-xs font-medium">Site 2</div>
+                                    <div class="text-xs text-gray-500">3 tanks</div>
+                                </div>
+                                <div class="bg-white p-1 rounded-md shadow-sm relative">
+                                    <div class="status-badge bg-green-500"></div>
+                                    <div class="text-xs font-medium">Site 3</div>
+                                    <div class="text-xs text-gray-500">2 tanks</div>
+                                </div>
+                                <div class="bg-white p-1 rounded-md shadow-sm relative">
+                                    <div class="status-badge bg-green-500"></div>
+                                    <div class="text-xs font-medium">Site 4</div>
+                                    <div class="text-xs text-gray-500">5 tanks</div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-xs text-gray-500 mb-0.5">ALERTS</div>
+                            <div class="bg-red-50 border-l-2 border-red-500 p-1 rounded-md mb-1">
+                                <div class="text-xs font-medium text-red-700">Site 2: O2 Tank</div>
+                                <div class="text-xs text-gray-600">Pressure HIGH (15 Bar)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'default',
+                flowchart: {
+                    useMaxWidth: false,
+                    htmlLabels: true,
+                    curve: 'basis',
+                    nodeSpacing: 15,
+                    rankSpacing: 15
+                }
+            });
+        });
+    </script>
+</body>
+</html>

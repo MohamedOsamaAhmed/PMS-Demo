@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Acquisition Flow</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.6.0/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            overflow: hidden; /* Prevent body scroll */
+        }
+        .slide {
+            width: 1280px;
+            height: 100vh; /* Occupy full viewport height */
+            overflow: hidden;
+            position: relative;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex; /* Ensure flexbox layout */
+            flex-direction: column;
+        }
+        .header-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #0052D4, #4364F7, #6FB1FC);
+        }
+        .circuit-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            background-image: 
+              linear-gradient(90deg, #0052D4 1px, transparent 1px),
+              linear-gradient(0deg, #0052D4 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 0;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            padding: 10px 20px; /* Reduced vertical padding */
+        }
+        .mermaid {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+        }
+        .flow-step {
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .flow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="slide flex flex-col">
+        <div class="header-accent"></div>
+        <div class="circuit-lines"></div>
+        
+        <div class="content flex-grow flex flex-col py-12 px-16">
+            <h1 class="text-4xl font-bold mb-8 text-gray-800 border-b-2 border-blue-500 pb-2">Data Acquisition Flow</h1>
+            
+            <div class="flex-grow flex flex-col justify-center">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-lg mb-8">
+                    <div class="mermaid flex justify-center" style="height: 260px; overflow: visible;">
+                        graph LR
+                            A["Sensor<br>(Pressure/eControl)"] -->|"4-20mA Signal"| B["Site MCU<br>(Analog Input)"]
+                            B --> C["Digital Conversion<br>& Local Processing"]
+                            C -->|"Ethernet"| D["Central<br>Monitoring Unit"]
+                            
+                            classDef sensor fill:#f9d2c0,stroke:#e67e22,stroke-width:2px
+                            classDef mcu fill:#c7ecee,stroke:#2980b9,stroke-width:2px
+                            classDef process fill:#d5f5e3,stroke:#27ae60,stroke-width:2px
+                            classDef cmu fill:#e8daef,stroke:#8e44ad,stroke-width:2px
+                            
+                            class A sensor
+                            class B mcu
+                            class C process
+                            class D cmu
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-4 gap-6 mt-4">
+                    <div class="flow-step bg-orange-50 border-t-4 border-orange-400">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-wave-square text-orange-500 mr-2 text-xl"></i>
+                            <h3 class="text-lg font-semibold text-orange-700">Sensor</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Pressure sensors or eControl systems capture real-time measurements</p>
+                    </div>
+                    
+                    <div class="flow-step bg-blue-50 border-t-4 border-blue-400">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-microchip text-blue-500 mr-2 text-xl"></i>
+                            <h3 class="text-lg font-semibold text-blue-700">Site MCU</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Micro Control Unit receives 4-20mA analog input from sensors</p>
+                    </div>
+                    
+                    <div class="flow-step bg-green-50 border-t-4 border-green-400">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-cogs text-green-500 mr-2 text-xl"></i>
+                            <h3 class="text-lg font-semibold text-green-700">Processing</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Converts analog signals to digital data and performs local calculations</p>
+                    </div>
+                    
+                    <div class="flow-step bg-purple-50 border-t-4 border-purple-400">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-server text-purple-500 mr-2 text-xl"></i>
+                            <h3 class="text-lg font-semibold text-purple-700">Central Monitoring</h3>
+                        </div>
+                        <p class="text-sm text-gray-600">Receives data via Ethernet for comprehensive system monitoring</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'default',
+                flowchart: {
+                    useMaxWidth: false,
+                    htmlLabels: true,
+                    curve: 'cardinal'
+                }
+            });
+        });
+    </script>
+</body>
+</html>
